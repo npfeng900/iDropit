@@ -36,35 +36,11 @@ class GameViewController: UIViewController, UIDynamicAnimatorDelegate {
     }()
     /** Behavior */
     let dropitBehavior = DropitBehavior()
-    var attachmentBehavior: UIAttachmentBehavior? {
-        willSet {
-            if let attachmentBehaviorToRemove = attachmentBehavior {
-                animator.removeBehavior(attachmentBehaviorToRemove)
-                gameView.setPath(nil, named: PathNames.Attachment)
-            }
-        }
-        //在grabDrop中会运行下面的code
-        didSet {
-            if let attachmentBehaviorToAdd = attachmentBehavior {
-                animator.addBehavior(attachmentBehaviorToAdd)
-                
-                //attachedView会随着attachmentBehavior进行刷新
-                attachmentBehavior?.action = { [unowned self] in
-                    if let attachedView = self.attachmentBehavior?.items.first as? UIView {
-                        let path = UIBezierPath()
-                        path.moveToPoint((self.attachmentBehavior?.anchorPoint)!)
-                        path.addLineToPoint(attachedView.center)
-                        self.gameView.setPath(path, named: PathNames.Attachment)
-                    }
-                }
-            }
-        }
-    }
+   
     
     /** Constant */
     struct PathNames {
         static let MiddleBarrier = "Middle Barrier"
-        static let Attachment = "Attachment"
     }
     
     // MARK: - ViewController Lifecycle
@@ -155,13 +131,13 @@ class GameViewController: UIViewController, UIDynamicAnimatorDelegate {
         {
         case .Began:
             if let viewToAttachTo = lastDropit {
-                attachmentBehavior = UIAttachmentBehavior(item: viewToAttachTo, attachedToAnchor: gesturePoint)
+                dropitBehavior.addAttachment(dropView: viewToAttachTo, AnchorPoint: gesturePoint)
                 lastDropit = nil //不能反复抓住同一个dropit
             }
         case .Changed:
-            attachmentBehavior?.anchorPoint = gesturePoint
+            dropitBehavior.setAttachmentAnchorPoint(gesturePoint)
         case .Ended:
-            attachmentBehavior = nil
+            dropitBehavior.removeAttachment()
         default:
             break
         }
