@@ -32,6 +32,11 @@ class DropitBehavior: UIDynamicBehavior {
         addChildBehavior(droper)
     }
     
+    func addBarrierPath(path: UIBezierPath, named name: String) {
+        collider.removeBoundaryWithIdentifier(name)
+        collider.addBoundaryWithIdentifier(name, forPath: path)
+    }
+    
     func addDrop(dropView drop: UIView) {
         dynamicAnimator?.referenceView?.addSubview(drop)
         gravity.addItem(drop)
